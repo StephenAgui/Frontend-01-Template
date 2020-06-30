@@ -1,0 +1,31 @@
+<script>
+
+
+    var source = `
+    function sleep(t){
+        return new Promise(resolve=>{
+            setTimeout(resolve, t);
+        })
+    }`;
+
+    var regexp = /(function|new|return)|([ \t\r\n]+)|([a-zA-Z][a-zA-Z0-9]*)|(\(\)\{\}\,\;)/g;
+
+    var dictionary = ["keywords","whitespace","identifier","punctuator"];
+
+    var token = null;
+    var lastIndex = 0;
+    do{
+        lastIndex = regexp.lastIndex;
+        token = regexp.exec(source);
+        console.log(regexp.lastIndex);
+        console.log(token);
+        for(let i=1;i<4;i++){
+            if(token[i]){
+                console.log(dictionary[i-1]);
+            }
+        }
+
+    }while(regexp.lastIndex > lastIndex)
+
+    // let ss = "[a=value]".match(/\[([^=]+)=([^\]])\]/)
+</script>
