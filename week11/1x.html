@@ -4,12 +4,12 @@
         width: 6px;
         height: 6px;
         background-color: gray;
-        border-bottom: solid 1px white;
-        border-right: solid 1px white;
+        /* border-bottom: solid 1px white; */
+        /* border-right: solid 1px white; */
         vertical-align: middle;
     }
     #container{
-        width: 701px;
+        width: 600px;
     }
 
 
@@ -19,6 +19,32 @@
 <button onclick="localStorage.map = JSON.stringify(map)">save</button>
 <button onclick="findPath(map,[1,1],[50,50]);">findPath</button>
 <script>
+
+    class Sorted {
+        constructor(data,compare){
+            this.data = data;
+            this.compare = compare;
+        }
+        take(){
+            if(!this.data.length) return;
+            let min = this.data[0];
+            let minIndex = 0;
+            for(let i = 1; i<this.data.length; i++){
+                if(this.compare(this.data[i],min) < 0){
+                    min = this.data[i];
+                    minIndex = i;
+                }
+            }
+            this.data[minIndex] = this.data[this.data.length-1];
+            this.data.pop();
+            return min;
+        }
+        insert(v){
+            this.data.push(v);
+        }
+    }
+
+
     var map = localStorage.map? JSON.parse(localStorage.map):new Array(10000).fill(0);
     // var map = new Array(10001).join(0).split('').map(s=>Number(s));  //老式写法
     let container = document.getElementById("container");
@@ -61,31 +87,52 @@
 
     async function findPath(map, start, end) { 
         map = map.slice(); 
-        let queue = [start];
 
-        async function insert([x,y]){
+        function distance([x,y]){
+            return (x-end[0]) ** 2 + (y-end[1]) ** 2;
+        }
+
+        let collection = [start];
+
+        async function insert([x,y],pre){
             if(map[y*100+x] !== 0){
+                console.log("####:"+x,y);
                 return;
             }
             if(x<0 || y<0 || x>=100 || y>=100){
+                console.log("****:"+x,y);
                 return;
             }
-            map[100*y+x] = 2;
+            map[100*y+x] = pre;
             container.children[y*100+x].style.backgroundColor = "lightgreen";
-            await sleep(5);
-            queue.push([x,y]);
+            await sleep(1);
+            collection.push([x,y]);
         }
 
-        while(queue.length){
-            let [x,y] = queue.shift();//pop unshift / push shift
+        while(collection.length){
+            let [x,y] = collection.shift();//pop unshift / push shift
+            // let [x,y] = collection.take();
             console.log(x,y);
-            if(x == end[0] && y === end[1]) return true;
-            await insert([x-1,y]);
-            await insert([x+1,y]);
-            await insert([x,y-1]);
-            await insert([x,y+1]);
+            if(x == end[0] && y === end[1]){
+                let path = [];
+                while(x !== start[0] || y !== start[1]){
+                    path.push([x,y]);
+                    container.children[y*100+x].style.backgroundColor = "pink";
+                    [x,y] = map[y*100 + x];
+                }
+                return path;
+            }
+            await insert([x-1,y],[x,y]);
+            await insert([x+1,y],[x,y]);
+            await insert([x,y-1],[x,y]);
+            await insert([x,y+1],[x,y]);
+
+            await insert([x-1,y-1],[x,y]);
+            await insert([x+1,y+1],[x,y]);
+            await insert([x-1,y-1],[x,y]);
+            await insert([x+1,y+1],[x,y]);
         }
-        return false;
+        return null;
     }
 
     async function deapFindPath(map, start, end) { 

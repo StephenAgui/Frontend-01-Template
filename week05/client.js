@@ -47,6 +47,22 @@ ${this.bodyText}`;
                 console.log('received from serve:');
                 // resolve(data.toString());
                 parser.receive(data.toString())
+
+                var flexLine = [{}];
+                flexLine.mainSpace = 32;
+                flexLine.crossSpace = 20;
+
+                var flexLines = [];
+                flexLines.push(flexLine);
+
+                var item = {};
+
+                flexLine = [item];
+                flexLines.push(flexLine);
+
+                console.log(flexLine);
+
+
           console.log(parser.response,parser.isFinished, 'headers')
                 connection.end();
             });
@@ -175,8 +191,11 @@ class TrunkedBodyParser {
           }
           this.current = this.WAITING_LENGTH_LINE_END
         } else {
-          this.length *= 10
-          this.length += char.charCodeAt(0) - '0'.charCodeAt(0)
+          // this.length *= 10
+          // this.length += char.charCodeAt(0) - '0'.charCodeAt(0)
+          this.length *= 16;  //是16进制数据
+          this.length += parseInt(char,16);
+          console.log("##length:"+this.length);
         }
       } else if (this.current === this.WAITING_LENGTH_LINE_END) {
         if (char === '\n') {
@@ -206,8 +225,8 @@ void async function(){
     let request = new Request({
         methond:"POST",
         port:"8088",
-        host:"192.168.31.144",
-        // host:"127.0.0.1",
+        // host:"192.168.31.144",
+        host:"127.0.0.1",
         path:"/",
         body:{
             name:"winter"
@@ -217,6 +236,7 @@ void async function(){
         }
     });
     let Response = await request.send();
+    console.log("hahh");
     console.log(Response);
     
 }();

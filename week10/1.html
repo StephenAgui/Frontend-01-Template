@@ -60,15 +60,16 @@
                     },100)
                     
                 }
-                
+                color = 3 - color;
                 show();
+                
                 if(!isWin){
-                    color = 3 - color;
+                    
                     if(willWinWithNoClone(pattern,color)){
                         console.log((color == 2? "❌":"⭕️") + ' will Win');
                     }
                 }
-                
+                computerMove();
             }
 
             function computerMove(){
@@ -84,10 +85,11 @@
                     },100)
                     
                 }
-                
+                color = 3-color;
                 show();
+                
                 if(!isWin){
-                    color = 3-color;
+                    
                     if(willWinWithNoClone(pattern,color)){
                     console.log((color == 2? "❌":"⭕️") + ' will Win');
                 }
@@ -187,7 +189,29 @@
                 return null;
             }
 
+            let openings = new Map();
+            openings.set([
+                [0,0,0],
+                [0,0,0],
+                [0,0,0]
+            ].toString()+"1",{
+                point:[1,1],
+                result:0
+            });
+            openings.set([
+                [0,0,0],
+                [0,0,0],
+                [0,0,0]
+            ].toString()+"2",{
+                point:[0,0],
+                result:0
+            });
+            
+
             function bestChoice(pattern,color){
+                if(openings.has(pattern.toString()+color)){
+                    return openings.get(pattern.toString()+color);
+                }
                 let point = willWinWithNoClone(pattern,color);
                 if(point){
                     console.log('break');
